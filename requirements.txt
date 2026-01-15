@@ -1,0 +1,8 @@
+flask
+opencv-python
+torch
+torchvision
+ultralytics
+numpy
+pandas
+matplotlib
