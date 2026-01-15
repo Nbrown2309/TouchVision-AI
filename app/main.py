@@ -1,22 +1,26 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
+from services import process_video
 import os
 
-app = Flask(__name__)
-UPLOAD_FOLDER = 'videos'
+UPLOAD_FOLDER = "data/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/', methods=['GET', 'POST'])
-def upload_video():
-    if request.method == 'POST':
-        file = request.files['video']
-        if file:
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(filepath)
-            # Placeholder: call AI analysis function
-            metrics = {"message": "Video uploaded successfully! Processing soon."}
-            return render_template('results.html', results=metrics)
-    return render_template('upload.html')
+app = Flask(__name__)
+
+@app.route("/")
+def upload_page():
+    return render_template("upload.html")
+
+@app.route("/analyze", methods=["POST"])
+def analyze():
+    file = request.files["video"]
+    result = process_video(file)
+    return render_template("results.html", result=result)
+
+# Serve uploaded videos
+@app.route("/data/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 if __name__ == "__main__":
     app.run(debug=True)

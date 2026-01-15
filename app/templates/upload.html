@@ -12,6 +12,15 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
+<!-- Adding in a Form -->
+ <form id="uploadForm" action="/analyze" method="POST" enctype="multipart/form-data">
+  <div id="dropZone" class="relative border-2 border-dashed border-white/30 bg-white/5 rounded-xl p-12 transition-all duration-200">
+    <input id="fileInput" type="file" name="video" accept="video/*" class="hidden" />
+    ...
+  </div>
+</form>
+
+
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex flex-col">
 
   <!-- Header -->
@@ -205,17 +214,24 @@
     };
 
     analyzeBtn.onclick = () => {
-      if (!selectedFile) return;
-      loadingState.classList.remove("hidden");
-      analyzeBtn.disabled = true;
+  if (!selectedFile) return;
+  // Add file to form and submit
+  const formData = new FormData();
+  formData.append("video", selectedFile);
 
-      setTimeout(() => {
-        loadingState.classList.add("hidden");
-        completeState.classList.remove("hidden");
-        checkIcon.classList.remove("hidden");
-        analyzeBtn.disabled = false;
-      }, 3000);
-    };
+  fetch("/analyze", {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.text())
+  .then(html => {
+    document.open();
+    document.write(html);
+    document.close();
+  })
+  .catch(err => alert("Error uploading video: " + err));
+};
+
 
     ["dragenter", "dragover"].forEach(event => {
       dropZone.addEventListener(event, e => {
