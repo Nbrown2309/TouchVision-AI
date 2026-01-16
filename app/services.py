@@ -18,6 +18,6 @@ def process_video(file):
 
     return {
         "filename": file.filename,
-        "status": "Success",
-        "metrics": metrics
+        "player_movements": [5, 10, 15, 20],
+        "tactics": [2, 4, 6, 8]
     }
